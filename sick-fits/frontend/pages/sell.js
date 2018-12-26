@@ -1,9 +1,9 @@
 import React from 'react';
 
-const Home = props => (
+const Sell = props => (
     <div>
         <p>Sell!</p>
     </div>
 )
 
-export default Home;
+export default Sell;
