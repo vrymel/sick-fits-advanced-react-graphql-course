@@ -11,4 +11,5 @@ type Query {
     items(skip: Int, first: Int, orderBy: ItemOrderByInput): [Item]!
     item(where: ItemWhereUniqueInput!): Item
     itemsConnection(where: ItemWhereInput): ItemConnection
+    me: User
 }
