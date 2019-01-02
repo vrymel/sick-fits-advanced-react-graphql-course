@@ -4,8 +4,9 @@ const jwt = require("jsonwebtoken");
 function createUserToken(user) {
   return jwt.sign({ userId: user.id }, process.env.APP_SECRET);
 }
+const TOKEN_COOKIE_KEY = "token";
 function attachTokenCookie(ctx, token) {
-  ctx.response.cookie("token", token, {
+  ctx.response.cookie(TOKEN_COOKIE_KEY, token, {
     httpOnly: true,
     maxAge: 1000 * 60 * 60 * 24 * 365 // 1 year cookie
   });
@@ -88,6 +89,11 @@ const mutations = {
     attachTokenCookie(ctx, token);
     // return user
     return user;
+  },
+  signout(parent, args, ctx, info) {
+    ctx.response.clearCookie(TOKEN_COOKIE_KEY);
+
+    return { message: "User logged out!" };
   }
 };
 
