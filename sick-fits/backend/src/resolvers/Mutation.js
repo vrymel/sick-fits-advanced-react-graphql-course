@@ -21,9 +21,21 @@ async function hashPassword(password) {
 
 const mutations = {
   async createItem(parent, args, ctx, info) {
+    if (!ctx.request.userId) {
+      throw new Error("Please login before creating an item");
+    }
+
     const item = await ctx.db.mutation.createItem(
       {
-        data: { ...args }
+        data: {
+          // This is how to create a relationship between the Item and the User
+          user: {
+            connect: {
+              id: ctx.request.userId
+            }
+          },
+          ...args
+        }
       },
       info
     );
