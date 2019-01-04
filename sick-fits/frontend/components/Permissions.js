@@ -41,26 +41,28 @@ const Permissions = props => (
     {({ data, loading, error }) => (
       <div>
         <Error error={error} />
-        <div>
-          <h2>Manage Permissions</h2>
-          <Table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                {possiblePermissions.map(permission => (
-                  <th key={permission}>{permission}</th>
+        {data.users && (
+          <div>
+            <h2>Manage Permissions</h2>
+            <Table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  {possiblePermissions.map(permission => (
+                    <th key={permission}>{permission}</th>
+                  ))}
+                  <th>👇🏻</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.users.map(user => (
+                  <UserPermissions user={user} key={user.id} />
                 ))}
-                <th>👇🏻</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.users.map(user => (
-                <UserPermissions user={user} key={user.id} />
-              ))}
-            </tbody>
-          </Table>
-        </div>
+              </tbody>
+            </Table>
+          </div>
+        )}
       </div>
     )}
   </Query>
