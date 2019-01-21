@@ -4,6 +4,7 @@ const { randomBytes } = require("crypto");
 const { promisify } = require("util");
 const { transport, makeANiceEmail } = require("../mail");
 const { hasPermission } = require("../utils");
+const stripe = require("../stripe");
 
 function createUserToken(user) {
   return jwt.sign({ userId: user.id }, process.env.APP_SECRET);
@@ -291,6 +292,36 @@ const mutations = {
       },
       info
     );
+  },
+  async createOrder(_, args, ctx, info) {
+    // 1. Query the current user and make sure they are signed in
+    const { userId } = ctx.request;
+    if (!userId) {
+      throw new Error("You are not logged in");
+    }
+    // 2. Recalculate the total for the price
+    const { cart } = await ctx.db.query.user(
+      {
+        where: {
+          id: userId
+        }
+      },
+      `{ cart { id quantity item { title, price } } }`
+    );
+    const amount = cart.reduce((tally, { quantity, item: { price } }) => {
+      return tally + quantity * price;
+    }, 0);
+
+    // 3. Create the stripe charge
+    const charge = await stripe.charges.create({
+      amount,
+      currency: "USD",
+      source: args.token
+    });
+    // 4. Convert the CartItems to OrderItems
+    // 5. Create the Order
+    // 6. Clean up - clear the users cart, delete cartItems
+    // 7. Return the Order to the client
   }
 };
 
