@@ -306,7 +306,7 @@ const mutations = {
           id: userId
         }
       },
-      `{ cart { id quantity item { title, price } } }`
+      `{ cart { id quantity item { title description image largeImage price } } }`
     );
     const amount = cart.reduce((tally, { quantity, item: { price } }) => {
       return tally + quantity * price;
@@ -318,10 +318,44 @@ const mutations = {
       currency: "USD",
       source: args.token
     });
+
     // 4. Convert the CartItems to OrderItems
+    const orderItems = cart.map(cartItem => {
+      const orderItem = {
+        ...cartItem.item,
+        quantity: cartItem.quantity,
+        user: {
+          connect: {
+            id: userId
+          }
+        }
+      };
+
+      return orderItem;
+    });
+
     // 5. Create the Order
+    const order = await ctx.db.mutation.createOrder({
+      data: {
+        total: charge.amount,
+        charge: charge.id,
+        items: {
+          create: orderItems
+        },
+        user: {
+          connect: { id: userId }
+        }
+      }
+    });
+
     // 6. Clean up - clear the users cart, delete cartItems
+    const deleteCartItems = await ctx.db.mutation.deleteManyCartItems({
+      where: {
+        id_in: cart.map(({ id }) => id)
+      }
+    });
     // 7. Return the Order to the client
+    return order;
   }
 };
 
