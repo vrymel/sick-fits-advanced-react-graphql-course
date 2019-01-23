@@ -29,6 +29,28 @@ const Query = {
     const allUsers = await ctx.db.query.users({}, info);
 
     return allUsers;
+  },
+  async order(_parent, args, ctx, info) {
+    // 1. check if logged in
+    if (!ctx.request.userId) {
+      throw new Error("User is not logged in");
+    }
+
+    const order = await ctx.db.query.order(
+      {
+        where: { id: args.id }
+      },
+      info
+    );
+
+    const isOwner = order.user.id === ctx.request.userId;
+    const isAdmin = ctx.request.user.permissions.includes("ADMIN");
+
+    if (!isOwner || !isAdmin) {
+      throw new Error("You cant view this please");
+    }
+
+    return order;
   }
 };
 

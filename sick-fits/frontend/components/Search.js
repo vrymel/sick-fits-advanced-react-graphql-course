@@ -53,7 +53,6 @@ class AutoComplete extends React.Component {
   }, 350);
   render() {
     resetIdCounter();
-
     return (
       <SearchStyles>
         <Downshift
