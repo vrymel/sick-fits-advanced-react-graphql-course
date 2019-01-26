@@ -43,6 +43,8 @@ describe("<RequestReset/>", () => {
     wrapper.find("form").simulate("submit");
     await wait();
     wrapper.update();
+    await wait();
+    // console.log(wrapper.debug());
     expect(wrapper.find("p").text()).toContain(
       "Success! Check your email for a reset link!"
     );
